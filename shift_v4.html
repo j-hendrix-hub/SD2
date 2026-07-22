@@ -1603,7 +1603,7 @@ function getReportTime(courseId, driverId = null, dateStr = null) {
   const c = StateStore.getCourse(courseId);
   if (c && parseTimeToMinutes(c.reportTime) !== null) return c.reportTime;
   const settings = StateStore.getSettings();
-  return parseTimeToMinutes(settings.reportTime) !== null ? settings.reportTime : '8:10';
+  return parseTimeToMinutes(settings.reportTime) !== null ? settings.reportTime : '8:00';
 }
 /* 勤務時間帯 "8:10-17:40" を返す。算出不能なら空文字。workHoursを渡さない場合は自動取得 */
 function getWorkTimeRange(courseId, driverId = null, dateStr = null, workHours = null) {
