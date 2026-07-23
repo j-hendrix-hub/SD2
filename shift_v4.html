@@ -43,8 +43,8 @@
   --support-text: #34d399;
   --training-bg: #1d2130;
   --training-text: #93c5fd;
-  --annual-bg: #241f12;
-  --annual-text: #facc15;
+  --annual-bg: #0d2530;
+  --annual-text: #22d3ee;
   
   --sun-col: rgba(42, 16, 32, 0.4);
   --sat-col: rgba(26, 30, 48, 0.4);
@@ -257,7 +257,9 @@ table.shift tr:hover td { background-color: rgba(255,255,255,0.02); }
   letter-spacing:-0.3px;
   color:var(--work-text);
   font-family:'JetBrains Mono', monospace;
+  display:none; /* 出退勤時間はデフォルト非表示。「詳細」ボタンで表示 */
 }
+body.detail-mode .cell-timerange{ display:block; } /* 詳細モード時のみ画面に表示 */
 
 .cell-holiday{background:var(--holiday-bg);color:var(--holiday-text); border: 1px solid rgba(240, 96, 96, 0.2);}
 .cell-work{background:var(--work-bg);color:var(--work-text); border: 1px solid rgba(79, 142, 247, 0.2);}
@@ -266,15 +268,27 @@ table.shift tr:hover td { background-color: rgba(255,255,255,0.02); }
 /* 拡張勤務区分用 */
 .cell-support { background: var(--support-bg); color: var(--support-text); border: 1px solid rgba(52,211,153,0.3); }
 .cell-training { background: var(--training-bg); color: var(--training-text); border: 1px solid rgba(147,197,253,0.3); }
-.cell-annual { background: var(--annual-bg); color: var(--annual-text); border: 1px solid rgba(250,204,21,0.3); }
+.cell-annual { background: var(--annual-bg); color: var(--annual-text); border: 1px solid rgba(34,211,238,0.35); }
 
 .cell-dup{background:#2a2010;color:#f7a623;border:1px solid rgba(247, 166, 35, 0.4); animation: pulse 2s infinite;}
 .cell-fail{background:#2a1010;color:#f75252; border: 1px solid rgba(247, 82, 82, 0.4);}
 @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
-.row-total td,.row-total th{background:var(--surface3) !important;font-weight:700;font-size:11px;text-align:center;padding:6px 2px;}
+.row-total td,.row-total th{font-weight:700;font-size:11px;text-align:center;padding:6px 2px;}
+/* 背景のみ詳細度を (0,2,2) に上げ、土日色 (0,2,1) に強制指定なしで勝たせる */
+table.shift .row-total td,table.shift .row-total th{background:var(--surface3);}
 table.shift .row-total-head th{position:sticky;top:38px;z-index:9;border-bottom:1px solid var(--border);box-shadow:0 1px 0 var(--border);}
 table.shift .row-total-head .td-name{left:0;z-index:29;}
 table.shift .row-total-head .th-stat{right:0;z-index:24;}
+/* 充足時：右端の集計セルを透明化し、右への貼り付きも解除して背後の集計値を見せる
+   詳細度 (0,4,1) で競合ルールすべてに勝つため強制指定は不要 */
+table.shift .row-total-head .th-stat.stat-empty{
+  background:transparent;
+  box-shadow:none;
+  border-color:transparent;
+  right:auto;
+  min-width:0;
+  pointer-events:none;
+}
 .col-head-day{text-align:center;min-width:48px}
 .over{color:var(--danger);font-weight:900}
 .ok-text{color:var(--success)}
@@ -306,6 +320,8 @@ table.shift .row-total-head .th-stat{right:0;z-index:24;}
 .demand-card-title{font-size:14px;font-weight:700;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center; padding-bottom: 8px; border-bottom: 1px dashed var(--border);}
 .agg-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .period-badge{background:var(--surface3);border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--accent);font-family:'JetBrains Mono',monospace; letter-spacing: 0.5px;}
+/* ①期間表示バーは非表示（要素自体はJSが値を更新するため残す） */
+#hdrPeriod{display:none !important;}
 
 .cell-edit-modal .radio-list{ display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; margin: 16px 0; }
 .cell-edit-modal .radio-item{ display:flex; align-items:center; justify-content:center; gap:6px; padding:14px 10px; border-radius:10px; border:1px solid var(--border); cursor:pointer; transition:all .15s cubic-bezier(0.4, 0, 0.2, 1); background: var(--surface2); user-select: none; text-align: center; }
@@ -363,11 +379,11 @@ body.fullscreen-active .shift-wrap { flex: 1 !important; max-height: none !impor
   /* 拡張勤務区分用 印刷カラー */
   .cell-support { background: #d1fae5 !important; color: #047857 !important; border: 1px solid #6ee7b7 !important; }
   .cell-training { background: #e0f2fe !important; color: #0369a1 !important; border: 1px solid #7dd3fc !important; }
-  .cell-annual { background: #fef9c3 !important; color: #854d0e !important; border: 1px solid #fde68a !important; }
+  .cell-annual { background: #cffafe !important; color: #0e7490 !important; border: 1px solid #a5f3fc !important; }
   
   table.shift .col-sun { background: #fff5f5 !important; }
   table.shift .col-sat { background: #fffbeb !important; }
-  .cell-timerange { color: #1e40af !important; opacity: 1 !important; }
+  .cell-timerange { color: #1e40af !important; opacity: 1 !important; display: block !important; }
   
   @page {
     size: A3 landscape;
@@ -419,9 +435,9 @@ input[type=text]:disabled,input[type=number]:disabled{opacity:.5;cursor:not-allo
   .sidebar-overlay{display:none;opacity:0}
   .main-body{overflow:visible}
   .content{padding:10px 8px calc(20px + env(safe-area-inset-bottom, 0px))}
-  .header-actions{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .header-actions{width:100%;display:flex;flex-wrap:wrap;gap:6px}
   .header-actions .print-only-desktop{display:none!important}
-  .header-actions .btn{width:100%;min-height:40px;padding:8px 6px;font-size:12px}
+  .header-actions .btn{flex:1 0 auto;width:auto;min-width:0;white-space:nowrap;min-height:40px;padding:8px 6px;font-size:12px}
   .header-actions .btn-sm{padding:8px 6px;font-size:12px}
   .header-actions .btn-primary{grid-column:auto}
   #hdrPeriod{grid-column:1/-1;width:100%;text-align:center}
@@ -436,7 +452,12 @@ input[type=text]:disabled,input[type=number]:disabled{opacity:.5;cursor:not-allo
   table.shift{font-size:11px}
   table.shift th{font-size:10px;padding:6px 3px}
   table.shift td{padding:2px}
-  table.shift .td-name, table.shift .th-name{min-width:68px;width:68px;font-size:11px;padding:5px 4px}
+  table.shift .td-name, table.shift .th-name{min-width:44px;width:44px;max-width:44px;font-size:11px;padding:5px 4px}
+  /* 名前列の圧縮（スマホのみ／印刷・PCは従来どおり） */
+  table.shift .th-name{font-size:0}                                  /* 「ドライバー」を非表示 */
+  table.shift .row-total-head .td-name{font-size:0 !important}       /* 「出勤/総h」を非表示 */
+  table.shift .td-name div + div{display:none}                       /* 担当可能コースを非表示 */
+  table.shift .td-name div:first-child{width:36px;overflow:hidden;white-space:nowrap}  /* 3文字を超える名前は切る */
   table.shift .th-stat, table.shift .td-stat{position:static;right:auto;min-width:76px;box-shadow:none}
   .col-head-day{min-width:44px}
   .cell-inner{min-width:40px;min-height:34px;font-size:10px;padding:3px 2px}
@@ -487,15 +508,15 @@ input[type=text]:disabled,input[type=number]:disabled{opacity:.5;cursor:not-allo
   </div>
   <div class="header-actions" id="printHideArea">
     <div class="period-badge" id="hdrPeriod">—</div>
-    <button class="btn btn-ghost btn-sm" id="undoBtn" onclick="App.history.undo()" disabled title="元に戻す（Ctrl+Z）">↩ 戻る</button>
-    <button class="btn btn-ghost btn-sm" id="redoBtn" onclick="App.history.redo()" disabled title="やり直す（Ctrl+Y）">↪ 進む</button>
+    <button class="btn btn-ghost btn-sm" id="undoBtn" onclick="App.history.undo()" disabled title="元に戻す（Ctrl+Z）">↩</button>
+    <button class="btn btn-ghost btn-sm" id="redoBtn" onclick="App.history.redo()" disabled title="やり直す（Ctrl+Y）">↪</button>
     <button class="btn btn-ghost btn-sm print-only-desktop" onclick="App.backup.export()">💾 バックアップ</button>
     <button class="btn btn-ghost btn-sm print-only-desktop" onclick="App.backup.importClick()">📂 読込</button>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="App.backup.importFile(this)">
-    <button class="btn btn-warn btn-sm" onclick="App.shift.exportCSV()">📥 CSV</button>
-    <button class="btn btn-ghost btn-sm" onclick="App.shift.printShift()">🖨️ 印刷</button>
-    <button class="btn btn-danger btn-sm" onclick="App.shift.clearUnlockedCells()">🧹 全消去</button>
-    <button class="btn btn-primary" onclick="App.shift.generate()">✨ 自動生成</button>
+    <button class="btn btn-ghost btn-sm" onclick="App.shift.printShift()">🖨️</button>
+    <button class="btn btn-warn btn-sm" onclick="App.shift.exportCSV()">CSV</button>
+    <button class="btn btn-danger btn-sm" onclick="App.shift.clearUnlockedCells()">🧹</button>
+    <button class="btn btn-primary" onclick="App.shift.generate()">自動生成</button>
     <button class="btn btn-success" id="manualSaveBtn" disabled style="cursor: default;">✓ 自動保存済</button>
   </div>
 </header>
@@ -557,19 +578,13 @@ input[type=text]:disabled,input[type=number]:disabled{opacity:.5;cursor:not-allo
   <div class="page active" id="page-shift">
     <div class="panel" id="shiftPanel">
       <div class="panel-header">
-        <span class="panel-title">📋 シフト表 (労働時間・残業管理)</span>
         <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
           <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;user-select:none;">
             <input type="checkbox" id="autoLockManualInputCheckbox" onchange="App.shift.toggleAutoLockManualInput()">
-            🔒 セルを固定する
+            セル固定
           </label>
-          <button class="btn btn-ghost btn-sm" id="fullscreenToggleBtn" onclick="App.shift.toggleFullscreen()" style="font-weight:700; color:var(--accent); border-color:rgba(79, 142, 247, 0.3); padding: 5px 12px; font-size:12px;">📱 全画面表示</button>
-          <div style="display:flex;gap:8px;font-size:11px;align-items:center;flex-wrap:wrap; font-weight:600;">
-            <span style="background:var(--work-bg);color:var(--work-text);padding:3px 6px;border-radius:4px; border:1px solid rgba(79, 142, 247, 0.2);">出勤</span>
-            <span style="background:var(--holiday-bg);color:var(--holiday-text);padding:3px 6px;border-radius:4px; border:1px solid rgba(240, 96, 96, 0.2);">公休</span>
-            <span style="background:var(--request-bg);color:var(--request-text);padding:3px 6px;border-radius:4px; border:1px solid rgba(208, 96, 240, 0.2);">希望休</span>
-            <span style="background:#2a2010;color:#f7a623;padding:3px 6px;border-radius:4px; border:1px solid rgba(247, 166, 35, 0.4);">重複⚠</span>
-          </div>
+          <button class="btn btn-ghost btn-sm" id="fullscreenToggleBtn" onclick="App.shift.toggleFullscreen()" style="font-weight:700; color:var(--accent); border-color:rgba(79, 142, 247, 0.3); padding: 5px 12px; font-size:12px;">全画面</button>
+          <button class="btn btn-ghost btn-sm" id="detailToggleBtn" onclick="App.shift.toggleDetail()" style="font-weight:700; color:var(--text2); border-color:var(--border2); padding: 5px 12px; font-size:12px;">詳細</button>
         </div>
       </div>
       <div class="shift-wrap">
@@ -758,6 +773,18 @@ input[type=text]:disabled,input[type=number]:disabled{opacity:.5;cursor:not-allo
     <div class="flex-center" style="justify-content:flex-end; gap:12px; margin-top: 12px;">
       <button class="btn btn-ghost" onclick="App.ui.closeConfirm(false)">キャンセル</button>
       <button class="btn btn-danger" id="confirmOkBtn" onclick="App.ui.closeConfirm(true)">実行する</button>
+    </div>
+  </div>
+</div>
+
+<!-- DAY COVERAGE MODAL (サマリーセルのタップで表示) -->
+<div class="modal-overlay" id="dayCoverageModal" style="z-index:10550;" onclick="if(event.target===this)App.shift.closeDayCoverage()">
+  <div class="modal" style="max-width:360px;">
+    <h3 id="dayCoverageTitle" style="color:var(--accent)">📅</h3>
+    <div id="dayCoverageBody" style="font-size:13px;line-height:1.6;margin:8px 0 16px;"></div>
+    <hr class="divider">
+    <div class="flex-center" style="justify-content:flex-end;margin-top:12px;">
+      <button class="btn btn-ghost" onclick="App.shift.closeDayCoverage()">閉じる</button>
     </div>
   </div>
 </div>
@@ -2217,6 +2244,45 @@ const App = {
     _lastFailures: [],
     _cellEditCtx: null,
     _isFullscreen: false,
+    _showDetail: false,
+
+    // 日別サマリーセルのタップで、その日の不足・重複コースを表示する
+    showDayCoverage(el) {
+      const d = el.dataset;
+      const rows = [];
+      const addRow = (label, val, color) => {
+        if (!val) return;
+        rows.push(`<div style="margin-top:10px;">
+          <span style="color:${color};font-weight:700;font-size:12px;">${label}</span><br>
+          <span style="color:var(--text);font-size:15px;font-weight:700;">${esc(val).replace(/\//g, '　')}</span>
+        </div>`);
+      };
+      addRow('不足しているコース', d.short, 'var(--danger)');
+      addRow('重複しているコース', d.dup, '#f7a623');
+      addRow('不要なコース', d.extra, 'var(--text2)');
+
+      const head = `<div style="color:var(--text2);">出勤 <b style="color:var(--text);font-size:15px;">${esc(d.assigned)}</b> / ${esc(d.req)}人　　総労働 <b style="color:var(--text);font-size:15px;">${esc(d.hours)}</b>h</div>`;
+      const body = rows.length
+        ? head + rows.join('')
+        : head + `<div style="margin-top:10px;color:var(--success);font-weight:700;">すべてのコースが充足しています</div>`;
+
+      document.getElementById('dayCoverageTitle').textContent = '📅 ' + d.day;
+      document.getElementById('dayCoverageBody').innerHTML = body;
+      document.getElementById('dayCoverageModal').classList.add('show');
+    },
+
+    closeDayCoverage() {
+      document.getElementById('dayCoverageModal').classList.remove('show');
+    },
+
+    toggleDetail() {
+      // 出退勤時間の表示ON/OFF。bodyのクラスを切り替えるだけで、表の再生成やデータ再計算は行わない（軽量）。
+      this._showDetail = !this._showDetail;
+      document.body.classList.toggle('detail-mode', this._showDetail);
+      const btn = document.getElementById('detailToggleBtn');
+      if (btn) btn.innerHTML = this._showDetail ? '通常' : '詳細';
+      this.showToast(this._showDetail ? '🕐 出退勤時間を表示しました' : '出退勤時間を非表示にしました', 'info');
+    },
 
     toggleFullscreen() {
       this._isFullscreen = !this._isFullscreen;
@@ -2375,7 +2441,7 @@ const App = {
           console.error(err);
           this.showToast('❌ 自動生成中にエラーが発生しました', 'danger');
         } finally {
-          if (btn) { btn.disabled = false; btn.innerHTML = '✨ 自動生成'; }
+          if (btn) { btn.disabled = false; btn.innerHTML = '自動生成'; }
         }
       }, 50);
     },
@@ -2691,15 +2757,22 @@ const App = {
           detailText = details.join(' ');
         }
 
-        totalHtml += `<th class="${bgCls}">
+        // 3行目（✅/⚠の行）は表示しない。詳細はセルをタップすると表示される（showDayCoverage）。
+        totalHtml += `<th class="${bgCls}" style="cursor:pointer;"
+            onclick="App.shift.showDayCoverage(this)"
+            data-day="${esc(day.label)} (${esc(day.dayName)})"
+            data-short="${esc(coverage.shortageCourses.join('/'))}"
+            data-dup="${esc(coverage.duplicateCourses.join('/'))}"
+            data-extra="${esc(coverage.extraCourses.join('/'))}"
+            data-assigned="${assigned}" data-req="${req}" data-hours="${dayHours.toFixed(1)}">
           <span class="${ok?'':'over'}">${assigned}</span><span style="color:var(--text3);font-size:9px">/${req}人</span>
           <div style="font-size:9px;font-weight:500;opacity:0.7;margin-top:2px;">${dayHours.toFixed(0)}h</div>
-          <div style="font-size:9px;color:${ok?'var(--success)':'var(--danger)'};margin-top:2px;" title="${esc(detailText)}">
-             ${statusText} <span style="font-size:8px;">${ok ? '' : esc(detailText).substring(0,5) + (detailText.length>5?'..':'')}</span>
-          </div>
         </th>`;
       });
-      totalHtml += `<th class="th-stat" style="background:var(--surface3);font-size:11px;font-weight:700;position:sticky;right:0;z-index:24;text-align:center;box-shadow:-1px 0 0 var(--border);color:${totalShortage===0?'var(--success)':'var(--danger)'}">${totalShortage===0?'✅充足':'⚠不足:'+totalShortage}</th>`;
+      // 充足時は stat-empty クラスを付け、CSS側(!important)で透明化＋右貼り付き解除する
+      const statEmpty = (totalShortage === 0);
+      const statInline = statEmpty ? '' : 'box-shadow:-1px 0 0 var(--border);color:var(--danger);';
+      totalHtml += `<th class="th-stat${statEmpty ? ' stat-empty' : ''}" style="${statInline}font-size:11px;font-weight:700;text-align:center;">${statEmpty ? '' : '⚠不足:' + totalShortage}</th>`;
       totalHtml += '</tr>';
       head.insertAdjacentHTML('afterend', totalHtml);
     },
